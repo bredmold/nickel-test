@@ -13,7 +13,7 @@
   },
   "files": [
     {
-      "includePattern": "target/(nickel-test.*\\.jar)",
+      "includePattern": "/home/travis/.m2/repository/nickel-test/nickel-test/1.0.0/(.*)",
       "uploadPattern": "$1"
     }
   ]
