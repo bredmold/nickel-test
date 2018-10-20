@@ -3,7 +3,12 @@
 # nickel-test
 Testing Tools for Java &amp; JUnit
 
-I've written tools like this many times over, so I thought I'd just write it one last time and put it on GitHub.
+A simple tool for managing unit tests data. An issue I've run into over and over in developing tests is how to
+manage the data that my tests inevitably need. This is the answer I've come up with. Name the data for the test
+case, so it's obvious which data is needed. This library helps keep an understandable link between test data
+and test case.
+
+It doesn't help at all with the problem of keeping your test data up to date.
 
 # How to Build
 ```bash
