@@ -16,20 +16,22 @@ import static java.util.Objects.requireNonNull;
  *
  * <p>Uses a fluent API to specify a test resource, read it, and return it.</p>
  */
-public class NickelTestResource {
-    public static NickelTestResource testResource() throws ClassNotFoundException {
-        return new NickelTestResource();
+public class NickelTestResource<T extends NickelTestResource> {
+    public static NickelTestResource<NickelTestResource> testResource() throws ClassNotFoundException {
+        return new NickelTestResource<>();
     }
 
     private final Method testMethod;
+    private final T instance;
     private String resourceExtension = "";
     private String resourceName = "";
     private String resourcePath = "";
 
     private boolean includeTestClassPackageInPath = false;
 
-    private NickelTestResource() throws ClassNotFoundException {
+    protected NickelTestResource() throws ClassNotFoundException {
         testMethod = locateTestMethod();
+        instance = (T) this;
     }
 
     /**
@@ -38,16 +40,16 @@ public class NickelTestResource {
      * @param includeTestClassPackageInPath If true, include the test class full package name in the resource path,
      *                                      otherwise, omit the package name from the path.
      */
-    public NickelTestResource forTestClass(boolean includeTestClassPackageInPath) {
+    public T forTestClass(boolean includeTestClassPackageInPath) {
         this.includeTestClassPackageInPath = includeTestClassPackageInPath;
         populateResourcePath();
-        return this;
+        return instance;
     }
 
     /**
      * Equivalent to calling <code>forTestClass(false)</code>
      */
-    public NickelTestResource forTestClass() {
+    public T forTestClass() {
         return forTestClass(false);
     }
 
@@ -57,17 +59,17 @@ public class NickelTestResource {
      * @param includeTestClassPackageInPath If true, include the test class full package name in the resource path,
      *                                      otherwise, omit the package name from the path.
      */
-    public NickelTestResource forTestMethod(boolean includeTestClassPackageInPath) {
+    public T forTestMethod(boolean includeTestClassPackageInPath) {
         this.includeTestClassPackageInPath = includeTestClassPackageInPath;
         populateResourcePath();
         populateResourceName();
-        return this;
+        return instance;
     }
 
     /**
      * Equivalent to calling <code>forTestMethod(false)</code>
      */
-    public NickelTestResource forTestMethod() {
+    public T forTestMethod() {
         return forTestMethod(false);
     }
 
@@ -76,9 +78,9 @@ public class NickelTestResource {
      *
      * @param resourceName Use this resource name when locating a resource
      */
-    public NickelTestResource resourceName(String resourceName) {
+    public T resourceName(String resourceName) {
         this.resourceName = resourceName;
-        return this;
+        return instance;
     }
 
     /**
@@ -90,9 +92,9 @@ public class NickelTestResource {
      * @param resourcePath Full resource path. This will be evaluated using {@link Class#getResourceAsStream(String)}
      *                     for the test class.
      */
-    public NickelTestResource resourcePath(String resourcePath) {
+    public T resourcePath(String resourcePath) {
         this.resourcePath = resourcePath;
-        return this;
+        return instance;
     }
 
     /**
@@ -100,9 +102,9 @@ public class NickelTestResource {
      *
      * @param resourceExtension This will be appended to the full resource name
      */
-    public NickelTestResource resourceExtension(String resourceExtension) {
+    public T resourceExtension(String resourceExtension) {
         this.resourceExtension = resourceExtension;
-        return this;
+        return instance;
     }
 
     /**
@@ -173,8 +175,8 @@ public class NickelTestResource {
 
     private void populateResourcePath() {
         String className = includeTestClassPackageInPath
-                ? testMethod.getDeclaringClass().getName()
-                : testMethod.getDeclaringClass().getSimpleName();
+            ? testMethod.getDeclaringClass().getName()
+            : testMethod.getDeclaringClass().getSimpleName();
 
         resourcePath = "/".concat(className.replace(".", "/"));
     }
@@ -186,13 +188,24 @@ public class NickelTestResource {
     private String fullResourcePath() {
         String partialResourceName = resourceName.concat(resourceExtension);
         return StringUtils.isBlank(resourcePath)
-                ? partialResourceName
-                : String.format("%s/%s", resourcePath, partialResourceName);
+            ? partialResourceName
+            : String.format("%s/%s", resourcePath, partialResourceName);
     }
 
-    private InputStream resolveStream() {
+    protected InputStream resolveStream() {
         String path = fullResourcePath();
         InputStream stream = testMethod.getDeclaringClass().getResourceAsStream(path);
         return requireNonNull(stream, path);
+    }
+
+    /**
+     * For sub-classes, set the resource extension if it's not already set.
+     *
+     * @param resourceExtension The resource extension to use, if it's not already given
+     */
+    protected void defaultResourceExtension(String resourceExtension) {
+        if (StringUtils.isBlank(this.resourceExtension)) {
+            this.resourceExtension = resourceExtension;
+        }
     }
 }
