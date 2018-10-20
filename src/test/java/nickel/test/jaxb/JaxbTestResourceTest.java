@@ -5,13 +5,14 @@ import org.junit.Test;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.io.IOException;
 
 import static nickel.test.jaxb.JaxbTestResource.jaxbTestResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JaxbTestResourceTest {
     @Test
-    public void bindToXml() throws ClassNotFoundException, JAXBException {
+    public void bindToXml() throws ClassNotFoundException, JAXBException, IOException {
         BeanClass instance = jaxbTestResource()
             .forTestMethod()
             .asXml(BeanClass.class);
@@ -20,7 +21,7 @@ public class JaxbTestResourceTest {
     }
 
     @Test
-    public void customContext() throws JAXBException, ClassNotFoundException {
+    public void customContext() throws JAXBException, ClassNotFoundException, IOException {
         BeanClass instance = jaxbTestResource()
             .forTestMethod()
             .withJaxbContext(JAXBContext.newInstance(BeanClass.class))

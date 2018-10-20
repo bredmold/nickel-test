@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nickel.test.NickelTestResource;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * JSON test resource, to be parsed using Jackson.
@@ -47,8 +48,10 @@ public class JacksonTestResource extends NickelTestResource<JacksonTestResource>
      */
     public <T> T asJson(Class<T> targetClass) throws IOException {
         defaultResourceExtension(".json");
-        return mapper.readerFor(targetClass)
-            .readValue(resolveStream());
+        try (InputStream stream = resolveStream()) {
+            return mapper.readerFor(targetClass)
+                .readValue(stream);
+        }
     }
 
     /**
@@ -62,7 +65,9 @@ public class JacksonTestResource extends NickelTestResource<JacksonTestResource>
      */
     public <T> T asJson(TypeReference<T> targetType) throws IOException {
         defaultResourceExtension(".json");
-        return mapper.readerFor(targetType)
-            .readValue(resolveStream());
+        try (InputStream stream = resolveStream()) {
+            return mapper.readerFor(targetType)
+                .readValue(stream);
+        }
     }
 }

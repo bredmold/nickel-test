@@ -5,6 +5,8 @@ import nickel.test.NickelTestResource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * JAXB Test resource for resources in XML
@@ -36,13 +38,15 @@ public class JaxbTestResource extends NickelTestResource<JaxbTestResource> {
      * @param <T>         Target type
      * @return Object instance of the target type
      */
-    public <T> T asXml(Class<T> targetClass) throws JAXBException {
+    public <T> T asXml(Class<T> targetClass) throws JAXBException, IOException {
         defaultResourceExtension(".xml");
-        StreamSource streamSource = new StreamSource(resolveStream());
-        return context(targetClass)
-            .createUnmarshaller()
-            .unmarshal(streamSource, targetClass)
-            .getValue();
+        try (InputStream stream = resolveStream()) {
+            StreamSource streamSource = new StreamSource(stream);
+            return context(targetClass)
+                .createUnmarshaller()
+                .unmarshal(streamSource, targetClass)
+                .getValue();
+        }
     }
 
     private JAXBContext context(Class<?> boundType) throws JAXBException {
