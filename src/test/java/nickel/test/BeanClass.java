@@ -32,4 +32,11 @@ public class BeanClass {
     public int hashCode() {
         return Objects.hash(value);
     }
+
+    @Override
+    public String toString() {
+        return "BeanClass{" +
+            "value=" + value +
+            '}';
+    }
 }

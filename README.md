@@ -51,3 +51,75 @@ public void bTest() {
         .asString("UTF-8");
 }
 ```
+
+## Properties Example
+
+```java
+@Test
+public void propertiesTest() {
+    /*
+    Load a resource from the classpath: /ThingTest/propertiesTest.properties
+     */
+    Properties props = testResource()
+        .forTestMethod()
+        .asProperties();
+}
+```
+
+## JSON Example
+To use JSON, you need to have the Jackson library in your classpath. It looks slightly different, overall.
+
+```java
+import static nickel.test.jackson.JacksonTestResource.jacksonTestResource;
+
+public class JsonTest {
+    @Test
+    public void test() {
+        /*
+        Load a resource from the classpath: /JsonTest/test.json
+         */
+        BeanClass bean = jacksonTestResource()
+            .forTestMethod()
+            .asJson(BeanClass.class);
+    }
+}
+```
+
+## XML Example
+Similar to JSON, above, we need a special XML custom test resource. This will let us use the JVM's JAXB implementation
+to parse XML.
+
+```java
+import static nickel.test.jaxb.JaxbTestResource.jaxbTestResource;
+
+public class JaxbTest {
+    @Test
+    public void test() {
+        /*
+        Load a resource from the classpath: /JaxbTest/test.xml
+         */
+        BeanClass bean = jaxbTestResource()
+            .forTestMethod()
+            .asXml(BeanClass.class);
+    }
+}
+```
+
+## YAML Example
+YAML processing is handled with the help of the SnakeYAML library.
+
+```java
+import static nickel.test.yaml.YamlTestResource.yamlTestResource;
+
+public class YamlTest {
+    @Test
+    public void test() {
+        /*
+        Load a resource from the classpath: /YamlTest/test.yaml
+         */
+        BeanClass bean = yamlTestResource()
+            .forTestMethod()
+            .asYaml(BeanClass.class);
+    }
+}
+```

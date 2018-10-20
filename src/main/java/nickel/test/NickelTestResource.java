@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.Properties;
 
 import static java.util.Objects.requireNonNull;
 
@@ -136,6 +137,36 @@ public class NickelTestResource<T extends NickelTestResource> {
     public String asString(String encoding) throws IOException {
         try (InputStream stream = resolveStream()) {
             return IOUtils.toString(stream, encoding);
+        }
+    }
+
+    /**
+     * Read properties from a Java Properties file.
+     *
+     * @return Properties object derived from the file
+     */
+    public Properties asProperties() throws IOException {
+        defaultResourceExtension(".properties");
+
+        try (InputStream stream = resolveStream()) {
+            Properties properties = new Properties();
+            properties.load(stream);
+            return properties;
+        }
+    }
+
+    /**
+     * Read properties from XML Properties file
+     *
+     * @return Properties object derived from the file
+     */
+    public Properties asXmlProperties() throws IOException {
+        defaultResourceExtension(".xml");
+
+        try (InputStream stream = resolveStream()) {
+            Properties properties = new Properties();
+            properties.loadFromXML(stream);
+            return properties;
         }
     }
 
