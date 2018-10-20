@@ -1,3 +1,5 @@
+![Build Status](https://travis-ci.org/bredmold/nickel-test.svg?branch=master)
+
 # nickel-test
 Testing Tools for Java &amp; JUnit
 
