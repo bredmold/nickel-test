@@ -1,0 +1,20 @@
+{
+  "package": {
+    "name": "nickel-test",
+    "repo": "bredmold",
+    "subject": "bredmold",
+    "vcs_url": "https://github.com/bredmold/nickel-test.git",
+    "licenses": [
+      "MIT"
+    ]
+  },
+  "version": {
+    "name": "1.0"
+  },
+  "files": [
+    {
+      "includePattern": "target/(nickel-test.*\\.jar)",
+      "uploadPattern": "$1"
+    }
+  ]
+}
