@@ -9,11 +9,15 @@
     ]
   },
   "version": {
-    "name": "1.0.0"
+    "name": "@VERSION@"
   },
   "files": [
     {
-      "includePattern": "/home/travis/.m2/repository/nickel-test/nickel-test/1.0.0/(.*)",
+      "includePattern": "/home/travis/.m2/repository/nickel-test/nickel-test/@VERSION@/(.*\\.jar)",
+      "uploadPattern": "$1"
+    },
+    {
+      "includePattern": "/home/travis/.m2/repository/nickel-test/nickel-test/@VERSION@/(.*\\.pom)",
       "uploadPattern": "$1"
     }
   ]
