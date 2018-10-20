@@ -14,11 +14,11 @@
   "files": [
     {
       "includePattern": "/home/travis/.m2/repository/nickel-test/nickel-test/@VERSION@/(.*\\.jar)",
-      "uploadPattern": "$1"
+      "uploadPattern": "nickel-test/nickel-test/$1"
     },
     {
       "includePattern": "/home/travis/.m2/repository/nickel-test/nickel-test/@VERSION@/(.*\\.pom)",
-      "uploadPattern": "$1"
+      "uploadPattern": "nickel-test/nickel-test/$1"
     }
   ]
 }
