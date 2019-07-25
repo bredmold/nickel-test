@@ -1,15 +1,12 @@
 package nickel.test;
 
+import nickel.test.junit4.Junit4StackBasedNamingStrategy;
+import nickel.test.strategy.ResourceNamingStrategy;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Properties;
 
 import static java.util.Objects.requireNonNull;
@@ -21,11 +18,10 @@ import static java.util.Objects.requireNonNull;
  */
 public class NickelTestResource<T extends NickelTestResource> {
     public static NickelTestResource<NickelTestResource> testResource() throws ClassNotFoundException {
-        return new NickelTestResource<>();
+        return new NickelTestResource<>(new Junit4StackBasedNamingStrategy());
     }
 
-    private final Method testMethod;
-    private final Method targetMethod;
+    private final ResourceNamingStrategy namingStrategy;
     private final T instance;
     private String resourceExtension = "";
     private String resourceName = "";
@@ -33,15 +29,8 @@ public class NickelTestResource<T extends NickelTestResource> {
 
     private boolean includeTestClassPackageInPath = false;
 
-    protected NickelTestResource() throws ClassNotFoundException {
-        testMethod = locateAnnotatedMethod(Test.class);
-        targetMethod = (testMethod != null)
-            ? testMethod
-            : locateAnnotatedMethod(Before.class);
-
-        if (targetMethod == null) {
-            throw new NickelTestException("Unable to locate a method annotated with either @Test or @Before");
-        }
+    public NickelTestResource(ResourceNamingStrategy namingStrategy) throws ClassNotFoundException {
+        this.namingStrategy = requireNonNull(namingStrategy, "namingStrategy");
 
         instance = (T) this;
     }
@@ -72,10 +61,6 @@ public class NickelTestResource<T extends NickelTestResource> {
      *                                      otherwise, omit the package name from the path.
      */
     public T forTestMethod(boolean includeTestClassPackageInPath) {
-        if (testMethod == null) {
-            throw new NickelTestException("No test method");
-        }
-
         this.includeTestClassPackageInPath = includeTestClassPackageInPath;
         populateResourcePath();
         populateResourceName();
@@ -185,50 +170,16 @@ public class NickelTestResource<T extends NickelTestResource> {
         }
     }
 
-    /**
-     * Examine the current thread's stack to find a target method. A target method is defined as follows:
-     * <ol>
-     * <li>Empty argument list</li>
-     * <li>Annotated with the selected annotation</li>
-     * </ol>
-     *
-     * @param annotationClass The annotation class we're searching for
-     * @return {@link Method} reference, if the method is found, otherwise null
-     */
-    private static <A extends Annotation> Method locateAnnotatedMethod(Class<A> annotationClass) throws ClassNotFoundException {
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        for (StackTraceElement element : stackTrace) {
-            String className = element.getClassName();
-            String methodName = element.getMethodName();
-
-            Class<?> stackClass;
-            Method candidateMethod;
-            try {
-                stackClass = Class.forName(className);
-                candidateMethod = ClassUtils.getPublicMethod(stackClass, methodName);
-            } catch (ClassNotFoundException | NoSuchMethodException e) {
-                continue;
-            }
-
-            A targetAnnotation = candidateMethod.getAnnotation(annotationClass);
-            if (targetAnnotation != null) {
-                return candidateMethod;
-            }
-        }
-
-        return null;
-    }
 
     private void populateResourcePath() {
-        String className = includeTestClassPackageInPath
-            ? targetMethod.getDeclaringClass().getName()
-            : targetMethod.getDeclaringClass().getSimpleName();
+        String suiteName = namingStrategy.suiteName(includeTestClassPackageInPath);
 
-        resourcePath = "/".concat(className.replace(".", "/"));
+        resourcePath = "/".concat(suiteName.replace(".", "/"));
     }
 
     private void populateResourceName() {
-        resourceName = targetMethod.getName();
+        resourceName = namingStrategy.testName()
+            .orElseThrow(() -> new NickelTestException("Outside the scope of a test"));
     }
 
     private String fullResourcePath() {
@@ -239,9 +190,14 @@ public class NickelTestResource<T extends NickelTestResource> {
     }
 
     protected InputStream resolveStream() {
-        String path = fullResourcePath();
-        InputStream stream = targetMethod.getDeclaringClass().getResourceAsStream(path);
-        return requireNonNull(stream, path);
+        try {
+            String path = fullResourcePath();
+            Class<?> testClass = Class.forName(namingStrategy.suiteName(true));
+            InputStream stream = testClass.getResourceAsStream(path);
+            return requireNonNull(stream, path);
+        } catch (ClassNotFoundException e) {
+            throw new NickelTestException(e);
+        }
     }
 
     /**

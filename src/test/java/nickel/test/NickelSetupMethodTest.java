@@ -36,6 +36,6 @@ public class NickelSetupMethodTest {
     @Test
     public void testMethodFailsDuringSetupMethod() {
         assertThat(nickelTestException).isNotNull();
-        assertThat(nickelTestException).hasFieldOrPropertyWithValue("message", "No test method");
+        assertThat(nickelTestException).hasFieldOrPropertyWithValue("message", "Outside the scope of a test");
     }
 }

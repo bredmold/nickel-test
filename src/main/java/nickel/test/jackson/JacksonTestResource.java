@@ -3,6 +3,8 @@ package nickel.test.jackson;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nickel.test.NickelTestResource;
+import nickel.test.junit4.Junit4StackBasedNamingStrategy;
+import nickel.test.strategy.ResourceNamingStrategy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,13 +19,13 @@ public class JacksonTestResource extends NickelTestResource<JacksonTestResource>
      * Acquire an instance.
      */
     public static JacksonTestResource jacksonTestResource() throws ClassNotFoundException {
-        return new JacksonTestResource();
+        return new JacksonTestResource(new Junit4StackBasedNamingStrategy());
     }
 
     private ObjectMapper mapper;
 
-    private JacksonTestResource() throws ClassNotFoundException {
-        super();
+    public JacksonTestResource(ResourceNamingStrategy namingStrategy) throws ClassNotFoundException {
+        super(namingStrategy);
         mapper = new ObjectMapper();
     }
 

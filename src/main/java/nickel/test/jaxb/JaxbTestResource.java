@@ -1,6 +1,8 @@
 package nickel.test.jaxb;
 
 import nickel.test.NickelTestResource;
+import nickel.test.junit4.Junit4StackBasedNamingStrategy;
+import nickel.test.strategy.ResourceNamingStrategy;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -13,12 +15,13 @@ import java.io.InputStream;
  */
 public class JaxbTestResource extends NickelTestResource<JaxbTestResource> {
     public static JaxbTestResource jaxbTestResource() throws ClassNotFoundException {
-        return new JaxbTestResource();
+        return new JaxbTestResource(new Junit4StackBasedNamingStrategy());
     }
 
     private JAXBContext context;
 
-    private JaxbTestResource() throws ClassNotFoundException {
+    public JaxbTestResource(ResourceNamingStrategy namingStrategy) throws ClassNotFoundException {
+        super(namingStrategy);
     }
 
     /**
