@@ -17,6 +17,12 @@ mvn clean install
 
 # How to Use It
 
+There are two main ways to use NickelTest
+1. Using static methods (assumes JUnit 4)
+1. As a JUnit Rule
+
+## Using NickelTest as static methods
+
 This tool is built to be used with JUnit v4.x (currently tested with JUnit 4.12).
 
 Here's a simple example:
@@ -57,7 +63,7 @@ public void bTest() {
 }
 ```
 
-## Properties Example
+### Properties Example
 
 ```java
 @Test
@@ -71,7 +77,7 @@ public void propertiesTest() {
 }
 ```
 
-## JSON Example
+### JSON Example
 To use JSON, you need to have the Jackson library in your classpath. It looks slightly different, overall.
 
 ```java
@@ -90,7 +96,7 @@ public class JsonTest {
 }
 ```
 
-## XML Example
+### XML Example
 Similar to JSON, above, we need a special XML custom test resource. This will let us use the JVM's JAXB implementation
 to parse XML.
 
@@ -110,7 +116,7 @@ public class JaxbTest {
 }
 ```
 
-## YAML Example
+### YAML Example
 YAML processing is handled with the help of the SnakeYAML library.
 
 ```java
@@ -128,3 +134,28 @@ public class YamlTest {
     }
 }
 ```
+
+## Using NickelTest as a JUnit 4 Rule
+NickelTest can be incorporated into your test as a Rule.
+
+```java
+import nickel.test.junit4.NickelTestRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+public class RuleTest {
+    @Rule
+    public NickelTestRule nickelTestRule = new NickelTestRule()
+
+    @Test
+    public void test() {
+        BeanClass bean = nickelTestRule.jacksonTestResource()
+            .forTestMethod()
+            .asJson(BeanClass.class);
+    }
+}
+```
+
+There are two advantages to using NickelTest in this mode
+1. The rule infrastructure allows NickelTest to resolve the test method during the setup phase of a test.
+2. Most IDEs will be able to auto-complete the methods on the rule, providing improved API discoverability.
