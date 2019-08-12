@@ -1,5 +1,6 @@
 package nickel.test.junit4;
 
+import nickel.test.annotations.NickelTestResource;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -12,6 +13,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NickelTestRuleTest {
     @Rule
     public NickelTestRule nickelTestRule = new NickelTestRule();
+
+    @NickelTestResource(with = NickelTestResource.Binding.jackson, resourceName = "jacksonTestResource")
+    private TestType jsonInstance;
+
+    @NickelTestResource(with = NickelTestResource.Binding.jaxb, resourceName = "jaxbTestResource")
+    private TestType jaxbInstance;
+
+    @NickelTestResource(with = NickelTestResource.Binding.yaml, resourceName = "yamlTestResource")
+    private TestType yamlInstance;
 
     @Test
     public void testResource() throws ClassNotFoundException, IOException {
@@ -44,6 +54,19 @@ public class NickelTestRuleTest {
             .forTestMethod()
             .asYaml(TestType.class))
             .isEqualTo(new TestType("yaml"));
+    }
+
+    @Test
+    public void injectionTest() {
+        assertThat(jsonInstance).isNull();
+        assertThat(jaxbInstance).isNull();
+        assertThat(yamlInstance).isNull();
+
+        nickelTestRule.injectResources(this);
+
+        assertThat(jsonInstance).isEqualTo(new TestType("value"));
+        assertThat(jaxbInstance).isEqualTo(new TestType("xml"));
+        assertThat(yamlInstance).isEqualTo(new TestType("yaml"));
     }
 
     public static class TestType {

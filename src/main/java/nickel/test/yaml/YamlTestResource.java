@@ -1,19 +1,20 @@
 package nickel.test.yaml;
 
 import nickel.test.NickelTestResource;
-import nickel.test.junit4.Junit4StackBasedNamingStrategy;
 import nickel.test.strategy.ResourceNamingStrategy;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import static nickel.test.strategy.StackBasedNamingStrategy.stackBasedStrategy;
+
 /**
  * YAML Test resource processed with the SnakeYAML library.
  */
 public class YamlTestResource extends NickelTestResource<YamlTestResource> {
     public static YamlTestResource yamlTestResource() throws ClassNotFoundException {
-        return new YamlTestResource(new Junit4StackBasedNamingStrategy());
+        return new YamlTestResource(stackBasedStrategy());
     }
 
     private Yaml yaml;

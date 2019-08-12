@@ -1,6 +1,5 @@
 package nickel.test;
 
-import nickel.test.junit4.Junit4StackBasedNamingStrategy;
 import nickel.test.strategy.ResourceNamingStrategy;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +9,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import static java.util.Objects.requireNonNull;
+import static nickel.test.strategy.StackBasedNamingStrategy.stackBasedStrategy;
 
 /**
  * Test case resource. Local a resource for your test!
@@ -17,8 +17,8 @@ import static java.util.Objects.requireNonNull;
  * <p>Uses a fluent API to specify a test resource, read it, and return it.</p>
  */
 public class NickelTestResource<T extends NickelTestResource> {
-    public static NickelTestResource<NickelTestResource> testResource() throws ClassNotFoundException {
-        return new NickelTestResource<>(new Junit4StackBasedNamingStrategy());
+    public static NickelTestResource<NickelTestResource> testResource() {
+        return new NickelTestResource<>(stackBasedStrategy());
     }
 
     private final ResourceNamingStrategy namingStrategy;
@@ -29,9 +29,10 @@ public class NickelTestResource<T extends NickelTestResource> {
 
     private boolean includeTestClassPackageInPath = false;
 
-    public NickelTestResource(ResourceNamingStrategy namingStrategy) throws ClassNotFoundException {
+    public NickelTestResource(ResourceNamingStrategy namingStrategy) {
         this.namingStrategy = requireNonNull(namingStrategy, "namingStrategy");
 
+        //noinspection unchecked
         instance = (T) this;
     }
 
@@ -169,7 +170,6 @@ public class NickelTestResource<T extends NickelTestResource> {
             return properties;
         }
     }
-
 
     private void populateResourcePath() {
         String suiteName = namingStrategy.suiteName(includeTestClassPackageInPath);
