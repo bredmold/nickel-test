@@ -234,6 +234,30 @@ jackson       | `com.fasterxml.jackson.binding.ObjectMapper`
 jaxb          | `javax.xml.bind.JAXBContext`
 yaml          | `org.yaml.snakeyaml.Yaml`
 
+## Test Method Argument Injection
+```java
+import nickel.test.annotations.NickelTestResource;
+import nickel.test.annotations.NickelTestResource.Binding;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+@ExtendWith(NickelTestExtension.class)
+class JacksonBindingTest {
+    @Test
+    void test(@NickelTestResource(with = Binding.yaml) BeanClass bean) {
+        /*
+        Test with your instance of BeanClass, which has now been initialized using Jackson
+         */
+    }
+}
+```
+
+This looks a lot like previous examples, except now we're injecting a method argument on a test case.
+
 ## Using NickelTest as a JUnit 4 Rule
 NickelTest can be incorporated into your test as a Rule.
 
