@@ -1,7 +1,6 @@
 package nickel.test.junit5;
 
 import nickel.test.annotations.NickelTestResource;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 

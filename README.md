@@ -135,6 +135,105 @@ public class YamlTest {
 }
 ```
 
+## Using NickelTest as a JUnit 5 Extension
+```java
+import nickel.test.annotations.NickelTestResource;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+@ExtendWith(NickelTestExtension.class)
+class JUnit5Test {
+    @NickelTestResource
+    private String stringValue;
+
+    @Test
+    void test() {
+        /*
+        You can use stringValue here, because it will have been initialized.
+         */
+    }
+}
+```
+
+Nice and simple. You annotate your field, and it gets loaded for you.
+
+### Object Binding in JUnit 5
+```java
+import nickel.test.annotations.NickelTestResource;
+import nickel.test.annotations.NickelTestResource.Binding;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+@ExtendWith(NickelTestExtension.class)
+class JacksonBindingTest {
+    @NickelTestResource(with = Binding.jackson)
+    private BeanClass bean;
+
+    @Test
+    void test() {
+        /*
+        Test with your instance of BeanClass, which has now been initialized using Jackson
+         */
+    }
+}
+```
+
+Well, that was easy. All you have to do is tell the Framework to use Jackson. But what if you need to control the binding process? Well, you supply your own `ObjectMapper`, of course!
+
+```java
+import nickel.test.annotations.BindingContext;
+import nickel.test.annotations.NickelTestResource;
+import nickel.test.annotations.NickelTestResource.Binding;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+@ExtendWith(NickelTestExtension.class)
+class JacksonBindingTest {
+    @NickelTestResource(with = Binding.jackson)
+    private BeanClass bean;
+
+    @BindingContext
+    private ObjectMapper mapper;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        /*
+        Do special stuff here to initialize your ObjectMapper
+         */
+    }
+
+    @Test
+    void test() {
+        /*
+        Test with your instance of BeanClass, which has now been initialized using Jackson
+         */
+    }
+}
+```
+
+Use the `@BindingContext` annotation to mark your framework-specific binding configuration:
+
+Binding Value | Binding Context Type
+------------- | --------------------
+jackson       | `com.fasterxml.jackson.binding.ObjectMapper`
+jaxb          | `javax.xml.bind.JAXBContext`
+yaml          | `org.yaml.snakeyaml.Yaml`
+
 ## Using NickelTest as a JUnit 4 Rule
 NickelTest can be incorporated into your test as a Rule.
 
