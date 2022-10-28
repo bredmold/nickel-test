@@ -16,7 +16,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <jackson.version>2.13.4.1</jackson.version>
-    <snakeyaml.version>1.26</snakeyaml.version>
+    <snakeyaml.version>1.32</snakeyaml.version>
     <commons-lang3.version>3.9</commons-lang3.version>
     <commons-io.version>2.7</commons-io.version>
     <commons-collections4.version>4.4</commons-collections4.version>
